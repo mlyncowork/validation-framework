@@ -44,7 +44,7 @@ fs.readdirSync(__dirname+'/../').forEach(dir => {
 
 
 
-let public = {
+let public_functions = {
 	validate: async function (route, params) {
 		ret = {};
 		if(route.validator){
@@ -67,7 +67,7 @@ let public = {
 						rule = _.merge({}, rule, await Rules[validatorParts[0]](route, params))
 					}
 				}catch(err){
-					throw new Error('Missing rule '+validatorPath)
+					throw new Error('Missing rule ' + validatorPath)
 				}
 			}
 
@@ -83,4 +83,4 @@ let public = {
 	}
 }
 
-module.exports = public;
+module.exports = public_functions;

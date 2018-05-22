@@ -379,7 +379,7 @@ let make = async function(data, rules){
 	return ret;
 }
 
-let public = function() {
+const public_functions = function() {
 	return {
 		validate: async function (data, rules) {
 			let mk = await make(data, rules);
@@ -483,4 +483,4 @@ let public = function() {
 	}
 }
 
-module.exports = public;
+module.exports = public_functions;
