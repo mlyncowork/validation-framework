@@ -1,25 +1,25 @@
-const _ = require('lodash');
-const validator = require('validator');
-const dot = require('dot-object');
+const _ = require("lodash");
+const validator = require("validator");
+const dot = require("dot-object");
 
 let Operands = {
-	'inArray': async function(property, value){
+	"inArray": async function(property, value){
 		return value.indexOf(property) >= 0;
 	},
-	'===': async function(property, value){
+	"===": async function(property, value){
 		return property === value;
 	},
-	'object-keys-equals' : async function(property, value){
+	"object-keys-equals" : async function(property, value){
 		return Object.keys(property).length === value;
 	},
-	'exist':async function(property, value){
-		return typeof property !== 'undefined';
+	"exist":async function(property, value){
+		return typeof property !== "undefined";
 	}
 }
 
 let Validators = {
 	isArray: async function(value, params){
-		//TODO: dorobit
+		//TODO:
 		return true;
 	},
 	isInt: async function(value, params){
@@ -29,7 +29,7 @@ let Validators = {
 		return !validator.isEmpty(value.toString());
 	},
 	isJson: async function(value, params){
-		//TODO: dorobit
+		//TODO:
 		return true;
 		//return validator.isJSON(value);
 	},
@@ -58,7 +58,7 @@ let Validators = {
 		return validator.isDivisibleBy(value.toString(), params.settings ? params.settings : undefined);
 	},
 	isDate: async function(value, params){
-		//TODO: dorobit
+		//TODO:
 		return true;
 	},
 	isEmpty: async function(value, params){
@@ -80,7 +80,7 @@ let Validators = {
 
 let Sanitizers = {
 	toNull : async function(value){
-		if(value === 'null'){
+		if(value === "null"){
 			return null;
 		}
 		return value;
@@ -99,9 +99,9 @@ let Sanitizers = {
 	},
 	toBoolean: async function(value){
 		try{
-			if(value === 'true'){
+			if(value === "true"){
 				value = true;
-			}else if(value === 'false'){
+			}else if(value === "false"){
 				value = false;
 			}
 		}catch(err){}
@@ -123,22 +123,22 @@ let Sanitizers = {
 };
 
 let DefaultSanitizers = {
-	isInt:['toInt'],
-	isFloat:['toFloat'],
-	isBoolean:['toBoolean'],
-	isJson:['toJson'],
-	null:['toNull']
-}
+	isInt:["toInt"],
+	isFloat:["toFloat"],
+	isBoolean:["toBoolean"],
+	isJson:["toJson"],
+	null:["toNull"]
+};
 
 
 let Helper = {
 	wildcardValue: function (wildcard, value){
-		let index = wildcard.split('.').indexOf('*');
+		let index = wildcard.split(".").indexOf("*");
 		if(index >= 0){
-			let parts_v = value.split('.');
-			let parts_w = wildcard.split('.');
-				parts_w[index] = parts_v[index];
-			return parts_w.join('.');
+			let parts_v = value.split(".");
+			let parts_w = wildcard.split(".");
+			parts_w[index] = parts_v[index];
+			return parts_w.join(".");
 		}else{
 			return wildcard;
 		}
@@ -156,7 +156,7 @@ let Helper = {
 				for (let p in current) {
 					isEmpty = false;
 					if(property && all === true){
-						flattened[property] = 'defined';
+						flattened[property] = "defined";
 					}
 					recurse(current[p], property ? property + "." + p : p);
 				}
@@ -196,18 +196,18 @@ let Helper = {
 	findObjKeys: function(key, data){
 		let ret = [];
 		let path = [];
-		let ar = key.split('.');
+		let ar = key.split(".");
 		for (let i = 0; i < ar.length; i++){
-			if(ar[i] === '*'){
+			if(ar[i] === "*"){
 				break;
 			}
 			path.push(ar[i]);
 		}
-		path = path.join('.');
+		path = path.join(".");
 		let data_part = Helper.objectPath(data, path);
 		if(data_part){
 			Object.keys(data_part).forEach(function(item){
-				ret.push(key.replace('*', item));
+				ret.push(key.replace("*", item));
 			});
 		}
 		return ret;
@@ -222,44 +222,44 @@ let Helper = {
 		};
 
 		for (let vlKey in params){
-			if(vlKey === 'if') {
-					let isElse = false;
-					let isOneTrue = false;
+			if(vlKey === "if") {
+				let isElse = false;
+				let isOneTrue = false;
 
-					for(let item_i in params.if){
-						let item = params.if[item_i];
+				for(let item_i in params.if){
+					let item = params.if[item_i];
 
-						if(item.condition === 'else'){
-							isElse = item.rules;
+					if(item.condition === "else"){
+						isElse = item.rules;
+					}else{
+						let property_string, value, operand;
+						if(_.isString(item.condition)){
+							let ifParts = item.condition.split("::");
+							property_string = ifParts[0];
+							value = ifParts[1];
+							operand = "===";
 						}else{
-							let property_string, value, operand;
-							if(_.isString(item.condition)){
-								let ifParts = item.condition.split('::');
-								property_string = ifParts[0];
-								value = ifParts[1];
-								operand = '===';
-							}else{
-								property_string = item.condition.property;
-								value = item.condition.value;
-								operand = item.condition.operand;
+							property_string = item.condition.property;
+							value = item.condition.value;
+							operand = item.condition.operand;
+						}
+
+						property_string = Helper.wildcardValue(property_string, key);
+						let property = item.condition.unflattened ? Helper.getUnflattenedValue(property_string, data) : Helper.getValue(property_string, flattened);
+
+						if(await Operands[operand](property, value)){
+							isOneTrue = true;
+							for (let rKey in item.rules) {
+								Helper.addCheck(ret, key, item.rules, rKey);
 							}
 
-							property_string = Helper.wildcardValue(property_string, key);
-							let property = item.condition.unflattened ? Helper.getUnflattenedValue(property_string, data) : Helper.getValue(property_string, flattened);
-
-							if(await Operands[operand](property, value)){
-								isOneTrue = true;
-								for (let rKey in item.rules) {
-									Helper.addCheck(ret, key, item.rules, rKey);
-								}
-
-							}
 						}
 					}
+				}
 
-					if(isElse !== false && isOneTrue === false){
-						ret[key].checks = _.merge({}, ret[key].checks, isElse);
-					}
+				if(isElse !== false && isOneTrue === false){
+					ret[key].checks = _.merge({}, ret[key].checks, isElse);
+				}
 			} else {
 				Helper.addCheck(ret, key, params, vlKey);
 			}
@@ -268,9 +268,9 @@ let Helper = {
 	},
 	addCheck: function(ret, retKey, rules, ruleKey){
 		switch (ruleKey) {
-			case 'required':
-			case 'null':
-			case 'sanitizer':
+			case "required":
+			case "null":
+			case "sanitizer":
 				ret[retKey][ruleKey] = rules[ruleKey];
 				break;
 			default:
@@ -282,17 +282,17 @@ let Helper = {
 		try {
 			return flattenedData[path];
 		} catch (error) {
-			return;
+			return {};
 		}
 	},
 	getUnflattenedValue: function(path, unflattenedData){
 		try {
-			let arr = path.split('.');
+			let arr = path.split(".");
 			let obj = unflattenedData;
 			while (arr.length && (obj = obj[arr.shift()])){}
 			return obj;
 		} catch (error) {
-			return;
+			return {};
 		}
 	},
 	addError: function(ret, key, value, validator, message){
@@ -305,7 +305,7 @@ let Helper = {
 		}
 
 		if (message === false) {
-			message = 'E_validation_error_' + validator;
+			message = "E_validation_error_" + validator;
 		}
 
 		ret.errors[key].messages.push({validator: validator, message: message});
@@ -360,12 +360,12 @@ let make = async function(data, rules){
 
 	for (let rKey in rules){
 		let vl = rules[rKey];
-		if(rKey.split('.').indexOf('*') >= 0){
+		if(rKey.split(".").indexOf("*") >= 0){
 
 			let objkeys = Helper.findObjKeys(rKey, data);
 			for (let item_i in objkeys) {
 				let item = objkeys[item_i];
-				ret.validations = _.merge({}, ret.validations, (await Helper.addRule(item, vl, flattened, data)))
+				ret.validations = _.merge({}, ret.validations, (await Helper.addRule(item, vl, flattened, data)));
 			}
 		}else{
 			ret.validations = _.merge({}, ret.validations, (await Helper.addRule(rKey, vl, flattened, data)));
@@ -408,12 +408,12 @@ const public_functions = function() {
 							message = rule.required.message;
 						}
 
-						ret = Helper.createError(ret, rKey, rule, 'required', message, false);
+						ret = Helper.createError(ret, rKey, rule, "required", message, false);
 					}
 
 				}
 
-				if(! _.isUndefined(rule.value)){
+				if(!_.isUndefined(rule.value)){
 					if(rule.value === null){
 						let message = false;
 						if(rule.null && rule.null.message){
@@ -425,7 +425,7 @@ const public_functions = function() {
 								globalError = rule.globalError.message;
 							}
 
-							ret = Helper.createError(ret, rKey, rule, 'not_null', message, false);
+							ret = Helper.createError(ret, rKey, rule, "not_null", message, false);
 						}else{
 							ret.values[rKey] = rule.value;
 						}

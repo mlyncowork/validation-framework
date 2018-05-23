@@ -4,7 +4,7 @@
   "description": "Validator framework for node.",
   "scripts": {
     "test": "nyc --require babel-register mocha",
-    "mocha": "mocha ./test/validators.js ./test/sanitizers.js ./test/operands.js ./test/customValidator.js"
+    "mocha": "mocha ./test/validators.js ./test/sanitizers.js ./test/operands.js ./test/customValidator.js ./test/customSanitizer.js ./test/customOperand.js"
   },
   "dependencies": {
     "dot-object": "^1.7.0",
