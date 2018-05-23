@@ -1,7 +1,34 @@
 {
-  "name": "validator",
   "version": "0.0.1",
-  "description": "Validator framework for node.",
+  "name": "Asynchronous-validator",
+  "description": "Asynchronous validator and sanitizer framework for node.js.",
+  "engines": {
+    "node": ">=8.9.4"
+  },
+  "keywords": [
+    "validator",
+    "validation",
+    "validate",
+    "sanitization",
+    "sanitize",
+    "sanitisation",
+    "sanitise",
+    "framework",
+    "express"
+  ],
+  "homepage": "https://github.com/owner/TODO#readme",
+  "bugs":{
+    "url" : "https://github.com/owner/TODO/issues",
+    "email" : "TODO@hostname.com"
+  },
+  "license": "MIT",
+  "contributors": [
+    {
+      "name" : "Michal Dolnák",
+      "email" : "mdolnak@kkmbfin.sk"
+    }
+  ],
+  "main": "asyncValidator.js",
   "scripts": {
     "test": "nyc --require babel-register mocha",
     "mocha": "mocha ./test/validators.js ./test/sanitizers.js ./test/operands.js ./test/customValidator.js ./test/customSanitizer.js ./test/customOperand.js"
