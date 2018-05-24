@@ -1,7 +1,7 @@
 {
   "version": "0.0.1",
-  "name": "Asynchronous-validator",
-  "description": "Asynchronous validator and sanitizer framework for node.js.",
+  "name": "validation-framework",
+  "description": "Asynchronous validation and sanitizer framework for node.js.",
   "engines": {
     "node": ">=8.9.4"
   },
@@ -16,9 +16,9 @@
     "framework",
     "express"
   ],
-  "homepage": "https://github.com/owner/TODO#readme",
+  "homepage": "https://github.com/mlyncowork/validation-framework#readme",
   "bugs":{
-    "url" : "https://github.com/owner/TODO/issues",
+    "url" : "https://github.com/mlyncowork/validation-framework/issues",
     "email" : "TODO@hostname.com"
   },
   "license": "MIT",

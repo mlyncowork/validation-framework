@@ -24,7 +24,7 @@ describe("Create and register your own validator", () => {
 				return false;
 			}
 		};
-		await asyncValidator.registerValidator("uniqEmail", validator_function);
+		asyncValidator.registerValidator("uniqEmail", validator_function);
 	});
 
 	it("should be able to use a custom validator", async () => {

@@ -22,7 +22,7 @@ converted to strings and one can use [validator.js](https://www.npmjs.com/packag
 
 ## Installation and Usage
 
-Install the library with `npm install validator`.
+Install the library with `npm install validator --save`.
 
 ## Validators
 
@@ -44,8 +44,53 @@ Validator                               | Description
 **isNumeric(params)**             | check if the string matches the comparison.
 **isLength(params)**             | check if the string matches the comparison.
 
-TODO register
+### Example usage
+Validator functions are invoked by path to property inside JSON data object. Optional arguments can be passed according to previous table.
 
+	const rule = { 
+	    "case.amount": { 
+	        isInt: { 
+    	    settings:{min:0, max: 2}
+            }
+        }
+    }
+    await asyncValidator.validate({"case": {"amount": 1}}, rule); // hasErrors: false
+
+#### Register custom validator
+You can add your own validator or override the default implementations. 
+
+##### Solution to unique constraint validation.
+You are only required to pass database rows or database connection inside params object instead of hard-coded database_rows.
+
+During update of the affected entity we must pass unique id of the entity in `params.id`.
+
+	const validator_function = async function (value, params) {
+			try {
+				const database_rows = [{id: 1, email: "foo@bar.com"}, {id: 2, email: "bar@foo.com"}];
+
+				const rows = _.filter(database_rows, {"email": value});
+
+				if (rows.length === 0) {
+					return true;
+				}
+
+				if (params.id && rows.length === 1 && (params.id === rows[0].id)) {
+					return true;
+				}
+
+				return false;
+			} catch (err) {
+				return false;
+			}
+		};
+    }
+	await asyncValidator.registerValidator("uniqEmail", validator_function);
+	const rule = { 
+        "email": { 
+            uniqEmail: {id: 1}
+          }
+    }
+    await asyncValidator.validate({email: "foo@foo.com"}, rule); // hasErrors: false 
 ## Sanitizers
 
 Here is a list of the available sanitizers.
@@ -58,22 +103,126 @@ Sanitizer                               | Description
 **toBoolean(value)**             | check if the string matches the comparison.
 **toJson(value)**             | check if the string matches the comparison.
 
+### Example usage
+
+    const rule = {
+        "property": {
+            sanitizer: "registeredSanitizerName",
+        }
+    }
+
+#### Custom sanitizer
+
+    const sanitizer_function = async function (value) {
+        try {
+            return new Date(value).toISOString();
+        } catch (err) {
+            return value;
+        }
+    };
+    await asyncValidator.registerSanitizer("toISOString", sanitizer_function);
+    const rule = {
+        "date": {
+            sanitizer: "toISOString",
+            isIn: {
+                settings:["2011-10-05T14:48:00.000Z"]
+            }, 
+        }
+    }
+
+
 ## Default sanitizers
+
+Here is a default configuration.
 
 Validator                               | Default sanitizer
 --------------------------------------- | --------------------------------------
-**tInt**            | **toInt**
+**isInt**            | **toInt**
 **isFloat**             | **toFloat**
 **isBoolean**             | **toBoolean**
 **isJson**             | **toJson**
 **null**             | **toNull**
 
-TODO register
+### Example usage
 
-let DefaultSanitizers = {
-	isInt:["toInt"],
-	isFloat:["toFloat"],
-	isBoolean:["toBoolean"],
-	isJson:["toJson"],
-	null:["toNull"]
-};
+When the sanitizer is registered we can set it as default for any validation function.
+
+    asyncValidator.setDefautlSanitizer("isDate", ["toISOString"]);
+
+## Operands and conditions
+
+Here is a list of the available operands.
+
+Operand                               | Description
+--------------------------------------- | --------------------------------------
+**inArray**            | check if the string contains the seed.
+**===**             | check if the string matches the comparison.
+**exist**             | check if the string matches the comparison.
+**object-keys-equals**             | check if the string matches the comparison.
+
+### Example usage
+    const rules = {
+            "number": {
+                if: [
+                    {
+                        condition: {
+                            property: "case.status",
+                            operand: "inArray",
+                            value: ["closed", "canceled"]
+                        },
+                        rules: {
+                            isInt:{
+                                settings:{min:0, max: 2}
+                            }
+                        }
+                    },
+                    {
+                        condition: {
+                            property: "case.status",
+                            operand: "inArray",
+                            value: ["new", "submitted"],
+                        },
+                        rules: {
+                            isInt: {
+                                settings: {min: -2, max: 0}
+                            }
+                        }
+                    }
+                ]
+           }
+     }
+     
+     await asyncValidator.validate({case: {status: "closed"}, number: 1}, rule); // hasErrors: false
+     await asyncValidator.validate({case: {status: "new"}, number: -1}, rule); // hasErrors: false
+     await asyncValidator.validate({case: {status: "new"}, number: 1}, rule); // hasErrors: true
+     
+### Custom operand
+    const operand = async function (property, value) {
+		return property > value;
+	};
+	asyncValidator.registerOperand(">", operand);
+	
+	const rules = {
+        "case.income_confirmation": {
+            if: [
+                {
+                    condition: {
+                        property: "case.amount",
+                        operand: ">",
+                        value: 5000
+                    },
+                    rules: {
+                        required: true
+                    }
+                }
+            ]
+        }
+    }
+    
+    await asyncValidator.validate({case: {amount: 5001}}, rule); // hasErrors: true
+    await asyncValidator.validate({case: {amount: 5001, income_confirmation: {} }}, rule); // hasErrors: false
+    await asyncValidator.validate({case: {amount: 4999}}, rule); // hasErrors: false
+    
+### Wildcards     
+     
+### Error messages

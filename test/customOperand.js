@@ -8,7 +8,7 @@ describe("Create and register your own operand", () => {
 		const operand = async function (property, value) {
 			return property > value;
 		};
-		await asyncValidator.registerOperand(">", operand);
+		asyncValidator.registerOperand(">", operand);
 	});
 
 	it("should be able to use a custom operand", async () => {
