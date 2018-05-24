@@ -1,5 +1,5 @@
 const assert = require("assert");
-const asyncValidator = require("../asyncValidator")();
+const asyncValidator = require("../index")();
 const helper = require("./helper");
 
 describe("Implemented validator functions", () => {

@@ -28,7 +28,7 @@
       "email" : "mdolnak@kkmbfin.sk"
     }
   ],
-  "main": "asyncValidator.js",
+  "main": "index.js",
   "scripts": {
     "test": "nyc --require babel-register mocha",
     "mocha": "mocha ./test/validators.js ./test/sanitizers.js ./test/operands.js ./test/customValidator.js ./test/customSanitizer.js ./test/customOperand.js"
