@@ -33,7 +33,7 @@ describe("Create and register your own sanitizer", () => {
 
 		const test_cases = [
 			{data: {date: test_date}, rules: {"date": {isDate: "true", isIn: {settings:[test_ISO_date]}, }},
-				hasErrors: true, message : "Incoming date in local timezone format is conve."},
+				hasErrors: false, message : "Incoming date in local timezone format is conve."},
 		];
 		await helper.run_test_cases(test_cases);
 	});
