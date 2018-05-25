@@ -1,6 +1,6 @@
 # Asynchronous validator
 
-[![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url]
+[![Build Status](https://travis-ci.org/mlyncowork/validation-framework.svg?branch=master)](https://travis-ci.org/mlyncowork/validation-framework)
 
 A small framework for validation of incoming JSON requests in Node.js.
 
