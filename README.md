@@ -65,24 +65,24 @@ You are only required to pass database rows or database connection inside params
 During update of the affected entity we must pass unique id of the entity in `params.id`.
 
 	const validator_function = async function (value, params) {
-			try {
-				const database_rows = [{id: 1, email: "foo@bar.com"}, {id: 2, email: "bar@foo.com"}];
+        try {
+            const database_rows = [{id: 1, email: "foo@bar.com"}, {id: 2, email: "bar@foo.com"}];
 
-				const rows = _.filter(database_rows, {"email": value});
+            const rows = _.filter(database_rows, {"email": value});
 
-				if (rows.length === 0) {
-					return true;
-				}
+            if (rows.length === 0) {
+                return true;
+            }
 
-				if (params.id && rows.length === 1 && (params.id === rows[0].id)) {
-					return true;
-				}
+            if (params.id && rows.length === 1 && (params.id === rows[0].id)) {
+                return true;
+            }
 
-				return false;
-			} catch (err) {
-				return false;
-			}
-		};
+            return false;
+            } catch (err) {
+                return false;
+            }
+	    };
     }
 	await asyncValidator.registerValidator("uniqEmail", validator_function);
 	const rule = { 
@@ -196,7 +196,7 @@ Operand                               | Description
      await asyncValidator.validate({case: {status: "new"}, number: -1}, rule); // hasErrors: false
      await asyncValidator.validate({case: {status: "new"}, number: 1}, rule); // hasErrors: true
      
-### Custom operand
+#### Custom operand
     const operand = async function (property, value) {
 		return property > value;
 	};
@@ -223,6 +223,50 @@ Operand                               | Description
     await asyncValidator.validate({case: {amount: 5001, income_confirmation: {} }}, rule); // hasErrors: false
     await asyncValidator.validate({case: {amount: 4999}}, rule); // hasErrors: false
     
-### Wildcards     
+## Wildcards
+
+When you want to apply to same rules for all keys of some object you can use `*` character.
+
+    const rules = {
+        "case.clients.*.age": {
+            
+            if: [
+                {
+                    condition: {
+                        property: "case.clients.*.family_status",
+                        operand: "===",
+                        value: "married"
+                    },
+                    rules: {
+                        isInt: {
+                            settings: {min:18}
+                        }
+                    }
+                },
+            ]
+        }
+    }
+
      
-### Error messages
+## Error messages
+
+The validator follows common pattern for emitting errors as translatable strings.   
+    
+    {
+        hasErrors: true // false if no errors
+        errors: { // if hasErrors === false then empty object
+            "email1" : { // name of field with errors
+                "messages": [ // array of all failed validators
+                    { validator: "isEmail", message: "E_validation_error_isEmail"} // message to translate 
+                ]
+            },
+            "email2" : 
+                "messages": [
+                    { validator: "uniqEmail", message: "E_validation_error_uniqEmail"}  
+                ]
+        }
+        values: {
+            "email1": "foo.com",
+            "email2": "foo@bar.com"
+        }
+    }

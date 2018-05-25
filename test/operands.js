@@ -60,7 +60,7 @@ describe("Implemented operands", () => {
 					}
 				},
 			]
-		}
+		};
 		const test_cases = [
 			{data: {
 			    case: {
@@ -82,7 +82,7 @@ describe("Implemented operands", () => {
 					clients: {
 						id_1: {
 							family_status: "married",
-							age: 22
+							age: 21
 						},
 						id_2: {
 							family_status: "married",
