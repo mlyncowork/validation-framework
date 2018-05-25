@@ -34,11 +34,11 @@ describe("Implemented operands", () => {
 		};
 		const test_cases = [
 			{data: {case: {status: "closed"}, number: 1}, rules: {"number": if_condition},
-				hasErrors: false, message : "When some entity has status closed. than number must be greater than zero."},
+				hasErrors: false, message : "First condition from multiple conditions is matched"},
 			{data: {case: {status: "new"}, number: -1}, rules: {"number": if_condition},
-				hasErrors: false, message : "When some entity has status new. than number must be lower than zero."},
+				hasErrors: false, message : "Second condition from multiple conditions is matched"},
 			{data: {case: {status: "new"}, number: 1}, rules: {"number": if_condition},
-				hasErrors: true, message : "When some entity has status new. than number must not be greater than zero."}
+				hasErrors: true, message : "Second condition from multiple conditions has error"}
 		];
 
 		await helper.run_test_cases(test_cases);
@@ -76,7 +76,7 @@ describe("Implemented operands", () => {
 					}
 
 				}}, rules: {"case.clients.*.age": if_condition},
-			hasErrors: false, message : "When any client have family_status equal to married, than his age must be greater than 18."},
+			hasErrors: false, message : "All objects are matching wildcard condition"},
 			{data: {
 				case: {
 					clients: {
@@ -91,7 +91,7 @@ describe("Implemented operands", () => {
 					}
 
 				}}, rules: {"case.clients.*.age": if_condition},
-			hasErrors: true, message : "When any client have family_status equal to married, than his age must not be lower than 18."}
+			hasErrors: true, message : "At least one object matching the condition has error"}
 		];
 
 		await helper.run_test_cases(test_cases);

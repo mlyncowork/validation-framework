@@ -30,11 +30,11 @@ describe("Create and register your own validator", () => {
 	it("should be able to use a custom validator", async () => {
 		const test_cases = [
 			{data: {email: "foo@bar.com"}, rules: {"email": {uniqEmail: true}},
-				hasErrors: true, message : "When some entity already has given email."},
+				hasErrors: true, message : "Given email is already taken"},
 			{data: {email: "foo@bar.com"}, rules: {"email": {uniqEmail: {id: 1}}},
-				hasErrors: false, message : "When some entity already has given email, but we pass id of this entity."},
+				hasErrors: false, message : "Given email is taken by the entity with expected id"},
 			{data: {email: "foo@foo.com"}, rules: {"email": {uniqEmail: true}},
-				hasErrors: false, message : "When we pass a completely new email."},
+				hasErrors: false, message : "New email is saved"},
 
 		];
 		await helper.run_test_cases(test_cases);

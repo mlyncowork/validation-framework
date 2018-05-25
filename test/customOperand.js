@@ -28,11 +28,9 @@ describe("Create and register your own operand", () => {
 		};
 		const test_cases = [
 			{data: {case: {amount: 5001}}, rules: {"case.income_confirmation": if_condition},
-				hasErrors: true, message : "."},
+				hasErrors: true, message : "Custom operator is used in condition with errors"},
 			{data: {case: {amount: 5001, income_confirmation: {} }}, rules: {"case.income_confirmation": if_condition},
-				hasErrors: false, message : "."},
-			{data: {case: {amount: 4999}}, rules: {"case.income_confirmation": if_condition},
-				hasErrors: false, message : "."}
+				hasErrors: false, message : "Custom operator is used in condition without errors"},
 		];
 		await helper.run_test_cases(test_cases);
 	});

@@ -13,14 +13,12 @@ We were dealing with a problem of validation and sanitation of multiple REST API
 We provide a configurable framework, which requires two inputs: data as JSON object (possibly with nested JSON objects)
 and rules as a path to validated property in data object and applied validations + sanitizers.
 
-We implemented wildcard (*) operator in rule's path, which will apply the rule to all objects in path.
+We use `*`(wildcard) operator in rule's path, which will apply the rule to all objects in path.
 
-We also implemented conditions in paths, that the rule will be applied conditionally on some other property in the data.
+Our framework enables the user to use conditions in paths, so the rule will be applied conditionally on some other property in the data.
 
-
-We are using [validator.js](https://www.npmjs.com/package/validator) for most our default validation functions. All passed values are
-converted to strings and one can use [validator.js](https://www.npmjs.com/package/validator) options, but options must be placed in settings property of the rule.
- 
+We are using this [validator](https://www.npmjs.com/package/validator) for most our default validation functions. All passed values are
+converted to strings and one can use [validator](https://www.npmjs.com/package/validator) options. Options must be placed in settings property of the rule.
 
 ## Installation and Usage
 
@@ -32,21 +30,24 @@ Here is a list of the available validators.
 
 Validator                               | Description
 --------------------------------------- | --------------------------------------
-**isInt(params)**            | check if the string contains the seed.
-**isString(params)**             | check if the string matches the comparison.
-**isEmail(params)**             | check if the string matches the comparison.
-**isBoolean(params)**             | check if the string matches the comparison.
-**isAlpha(params)**             | check if the string matches the comparison.
-**isAlphanumeric(params)**             | check if the string matches the comparison.
-**isDecimal(params)**             | check if the string matches the comparison.
-**isDivisibleBy(params)**             | check if the string matches the comparison.
-**isEmpty(params)**             | check if the string matches the comparison.
-**isFloat(params)**             | check if the string matches the comparison.
-**isIn(params)**             | check if the string matches the comparison.
-**isNumeric(params)**             | check if the string matches the comparison.
-**isLength(params)**             | check if the string matches the comparison.
+**isInt(value, params)**            | [Implemented by validator](https://www.npmjs.com/package/validator#validators)
+**isString(value, params)**             | check if the value is unempty string
+**isEmail(value, params)**             | [Implemented by validator](https://www.npmjs.com/package/validator#validators)
+**isBoolean(value, params)**             | [Implemented by validator](https://www.npmjs.com/package/validator#validators)
+**isAlpha(value, params)**             | [Implemented by validator](https://www.npmjs.com/package/validator#validators)
+**isAlphanumeric(value, params)**             | [Implemented by validator](https://www.npmjs.com/package/validator#validators)
+**isDecimal(value, params)**             | [Implemented by validator](https://www.npmjs.com/package/validator#validators)
+**isDivisibleBy(value, params)**             | [Implemented by validator](https://www.npmjs.com/package/validator#validators)
+**isEmpty(value, params)**             | [Implemented by validator](https://www.npmjs.com/package/validator#validators)
+**isFloat(value, params)**             | [Implemented by validator](https://www.npmjs.com/package/validator#validators)
+**isIn(value, params)**             | [Implemented by validator](https://www.npmjs.com/package/validator#validators)
+**isNumeric(value, params)**             | [Implemented by validator](https://www.npmjs.com/package/validator#validators)
+**isLength(value, params)**             | [Implemented by validator](https://www.npmjs.com/package/validator#validators)
+**required(value)**             | check if the value exists 
+**null(value)**             | enable the value to be null
 
 ### Example usage
+
 Validator functions are invoked by path to property inside JSON data object. Optional arguments can be passed according to previous table.
 
 	const rule = { 
@@ -59,10 +60,10 @@ Validator functions are invoked by path to property inside JSON data object. Opt
     await asyncValidator.validate({"case": {"amount": 1}}, rule); // hasErrors: false
 
 #### Register custom validator
+
 You can add your own validator or override the default implementations. 
 
-##### Solution to unique constraint validation.
-You are only required to pass database rows or database connection inside params object instead of hard-coded database_rows.
+##### Solution to unique constraint validation
 
 During update of the affected entity we must pass unique id of the entity in `params.id`.
 
@@ -93,17 +94,18 @@ During update of the affected entity we must pass unique id of the entity in `pa
           }
     }
     await asyncValidator.validate({email: "foo@foo.com"}, rule); // hasErrors: false 
+    
 ## Sanitizers
 
 Here is a list of the available sanitizers.
 
 Sanitizer                               | Description
 --------------------------------------- | --------------------------------------
-**toInt(value)**            | check if the string contains the seed.
-**toNull(value)**             | check if the string matches the comparison.
-**toFloat(value)**             | check if the string matches the comparison.
-**toBoolean(value)**             | check if the string matches the comparison.
-**toJson(value)**             | check if the string matches the comparison.
+**toInt(value)**            | converts string to int using [parseInt](https://www.w3schools.com/jsref/jsref_parseint.asp)
+**toNull(value)**             | converts string "null" to null
+**toFloat(value)**             |  converts string to float using [parseFloat](https://www.w3schools.com/jsref/jsref_parseFloat.asp)
+**toBoolean(value)**             | converts string "true" to true and string "false" to false 
+**toJson(value)**             | converts string to JSON object using [JSON.parse](https://www.w3schools.com/js/js_json_parse.asp)
 
 ### Example usage
 
@@ -157,10 +159,12 @@ Here is a list of the available operands.
 
 Operand                               | Description
 --------------------------------------- | --------------------------------------
-**inArray**            | check if the string contains the seed.
-**===**             | check if the string matches the comparison.
-**exist**             | check if the string matches the comparison.
-**object-keys-equals**             | check if the string matches the comparison.
+**inArray(property, value)**            | check if the given property is in array of values
+**===(property, value)**             | check if the given property equals to value
+**exist(property, value)**             | check if the given property exists(is not undefined)
+**object-keys-equals(property, value)**             | check if the object has exact amount of properties
+
+By default the validator will flatten the data in condition, if you do not want this behaviour than set `condition.unflattened` to true.
 
 ### Example usage
     const rules = {
@@ -249,7 +253,7 @@ When you want to apply to same rules for all keys of some object you can use `*`
     }
     
     await asyncValidator.validate({case: {clients: { id_1: { family_status: "married", age: 21},
-                                                     id_2: { family_status: "married", age: 17 }}, // this field age will have error
+                                                     id_2: { family_status: "married", age: 17 }}, // this field will have an error
                                                      rules); // hasErrors: true
     await asyncValidator.validate({case: {clients: { id_1: { family_status: "married", age: 21},
                                                      id_2: { family_status: "married", age: 22 }},

@@ -23,7 +23,7 @@ describe("Create and register your own sanitizer", () => {
 
 		const test_cases = [
 			{data: {date: test_date}, rules: {"date": {sanitizer: "toISOString", isIn: {settings:[test_ISO_date]}, }},
-				hasErrors: false, message : "Incoming date in local timezone format is conve."},
+				hasErrors: false, message : "Custom sanitizer is explicitly used"},
 		];
 		await helper.run_test_cases(test_cases);
 	});
@@ -33,7 +33,7 @@ describe("Create and register your own sanitizer", () => {
 
 		const test_cases = [
 			{data: {date: test_date}, rules: {"date": {isDate: "true", isIn: {settings:[test_ISO_date]}, }},
-				hasErrors: false, message : "Incoming date in local timezone format is conve."},
+				hasErrors: false, message : "Custom sanitizer is set as default and used implicitly"},
 		];
 		await helper.run_test_cases(test_cases);
 	});

@@ -5,8 +5,8 @@ const helper = require("./helper");
 describe("Implemented validator functions", () => {
 	it("should validate emails", async () => {
 		const test_cases = [
-			{data: {email:"foo"}, rules: {"email": {isEmail: true}}, hasErrors: true, message : "Correct email"},
-			{data: {email:"foo@foo.com"}, rules: {"email": {isEmail: true}}, hasErrors: false, message : "Wrong email"}
+			{data: {email:"foofoo.com"}, rules: {"email": {isEmail: true}}, hasErrors: true, message : "Missing @ in the email"},
+			{data: {email:"foo@foo.com"}, rules: {"email": {isEmail: true}}, hasErrors: false, message : "Correct email in name@address.domain format"}
 		];
 		await helper.run_test_cases(test_cases);
 	});
