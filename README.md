@@ -1,5 +1,7 @@
 # Asynchronous validator
 
+[![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url]
+
 A small framework for validation of incoming JSON requests in Node.js.
 
 ## The problem
@@ -228,12 +230,11 @@ Operand                               | Description
 When you want to apply to same rules for all keys of some object you can use `*` character.
 
     const rules = {
-        "case.clients.*.age": {
-            
+        "case.clients.*.age": { // for every client set validator of age property
             if: [
                 {
                     condition: {
-                        property: "case.clients.*.family_status",
+                        property: "case.clients.*.family_status", // depending on the particular client family_status property
                         operand: "===",
                         value: "married"
                     },
@@ -246,6 +247,13 @@ When you want to apply to same rules for all keys of some object you can use `*`
             ]
         }
     }
+    
+    await asyncValidator.validate({case: {clients: { id_1: { family_status: "married", age: 21},
+                                                     id_2: { family_status: "married", age: 17 }}, // this field age will have error
+                                                     rules); // hasErrors: true
+    await asyncValidator.validate({case: {clients: { id_1: { family_status: "married", age: 21},
+                                                     id_2: { family_status: "married", age: 22 }},
+                                  	                 rules); // hasErrors: false
 
      
 ## Error messages
