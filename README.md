@@ -24,6 +24,8 @@ converted to strings and one can use [validator](https://www.npmjs.com/package/v
 
 Install the library with `npm install validator --save`.
 
+Require the library with `const validator = require('validation-framework')()`.
+
 ## Validators
 
 Here is a list of the available validators.

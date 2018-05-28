@@ -1,5 +1,5 @@
 {
-  "version": "0.0.3",
+  "version": "0.0.4",
   "name": "validation-framework",
   "description": "Asynchronous validation and sanitizer framework for node.js.",
   "engines": {
@@ -19,7 +19,7 @@
   "homepage": "https://github.com/mlyncowork/validation-framework#readme",
   "bugs":{
     "url" : "https://github.com/mlyncowork/validation-framework/issues",
-    "email" : "TODO@hostname.com"
+    "email" : "npm@ahub.sk"
   },
   "license": "MIT",
   "contributors": [
