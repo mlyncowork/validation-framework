@@ -22,7 +22,7 @@ converted to strings and one can use [validator](https://www.npmjs.com/package/v
 
 ## Installation and Usage
 
-Install the library with `npm install validator --save`.
+Install the library with `npm install validation-framework --save`.
 
 Require the library with `const validator = require('validation-framework')()`.
 
